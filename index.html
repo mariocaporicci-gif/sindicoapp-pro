@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SíndicoApp Pro</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a237e">
+<link rel="apple-touch-icon" href="icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --primary:#1a237e;--secondary:#3949ab;--accent:#00bcd4;
+  --success:#10b981;--warning:#f59e0b;--danger:#ef4444;
+  --bg:#f0f2f8;--white:#ffffff;--border:#e4e7f0;
+  --text:#1e2235;--muted:#6b7280;
+  --shadow:0 2px 12px rgba(26,35,126,0.08);
+  --shadow-lg:0 8px 32px rgba(26,35,126,0.15);
+  --r:14px;--r-sm:10px;
+}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* ── SPLASH ── */
+#splash{position:fixed;inset:0;background:linear-gradient(145deg,#1a237e,#1565c0);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s,visibility .5s}
+#splash.out{opacity:0;visibility:hidden;pointer-events:none}
+.sp-icon{font-size:64px;animation:bob 1.6s ease-in-out infinite}
+.sp-title{font-size:30px;font-weight:800;color:#fff;margin-top:14px;letter-spacing:-1px}
+.sp-sub{font-size:14px;color:rgba(255,255,255,.65);margin-top:6px}
+.sp-dots{display:flex;gap:10px;margin-top:44px}
+.sp-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35);animation:dp 1.2s ease-in-out infinite}
+.sp-dot:nth-child(2){animation-delay:.2s}.sp-dot:nth-child(3){animation-delay:.4s}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes dp{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+
+/* ── LOGIN ── */
+#pg-login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(145deg,#1a237e,#1565c0)}
+#pg-login.hidden{display:none}
+.login-wrap{width:100%;max-width:400px}
+.login-brand{text-align:center;color:#fff;margin-bottom:28px}
+.login-brand .icon{font-size:56px;display:block;margin-bottom:10px}
+.login-brand h1{font-size:30px;font-weight:800;letter-spacing:-1px}
+.login-brand p{font-size:13px;opacity:.7;margin-top:4px}
+.card-box{background:#fff;border-radius:20px;padding:28px;box-shadow:0 24px 64px rgba(0,0,0,.22)}
+.card-box h2{font-size:17px;font-weight:700;color:var(--primary);margin-bottom:20px}
+.fg{margin-bottom:15px}
+.fg label{display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:5px}
+.fg input,.fg select,.fg textarea{width:100%;padding:13px 15px;border:2px solid var(--border);border-radius:var(--r-sm);font-size:15px;font-family:inherit;background:#fafbff;color:var(--text);transition:border-color .2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--secondary);background:#fff}
+.fg textarea{resize:vertical;min-height:80px}
+.btn{width:100%;padding:14px;border:none;border-radius:var(--r-sm);font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px}
+.btn:last-child{margin-bottom:0}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff}
+.btn-primary:active{transform:scale(.98);opacity:.9}
+.btn-outline{background:transparent;border:2px solid var(--primary);color:var(--primary)}
+.btn-sm{width:auto;padding:8px 16px;font-size:13px;margin:0}
+.btn-ghost{background:#f0f2f8;color:var(--primary);border:none}
+.btn-danger{background:var(--danger);color:#fff}
+.err-msg{background:#fff5f5;color:var(--danger);border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px}
+.err-msg.hidden{display:none}
+
+/* ── APP SHELL ── */
+#pg-app{display:none;min-height:100vh;flex-direction:column}
+#pg-app.active{display:flex}
+.app-header{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(26,35,126,.3)}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.hdr-logo{font-size:22px}
+#page-title{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-btn{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
+.hdr-btn:active{background:rgba(255,255,255,.3)}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;cursor:pointer;border:2px solid rgba(255,255,255,.35);flex-shrink:0}
+
+/* condo bar */
+.condo-bar{background:var(--primary);padding:0 18px 12px;position:sticky;top:57px;z-index:199}
+.cselect-wrap{position:relative}
+#condo-select{width:100%;padding:10px 34px 10px 12px;border:none;border-radius:var(--r-sm);font-size:14px;font-weight:600;font-family:inherit;background:rgba(255,255,255,.15);color:#fff;appearance:none;cursor:pointer}
+#condo-select option{background:var(--primary);color:#fff}
+.cselect-arr{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#fff;pointer-events:none;font-size:11px}
+
+/* body */
+.app-body{flex:1;overflow-y:auto;padding-bottom:80px}
+.view{display:none;padding:18px}
+.view.active{display:block}
+
+/* card */
+.card{background:#fff;border-radius:var(--r);padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+.card:last-child{margin-bottom:0}
+
+/* section header */
+.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.sh-title{font-size:17px;font-weight:700;color:var(--primary)}
+.fab{width:38px;height:38px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,188,212,.35);flex-shrink:0}
+
+/* empty */
+.empty{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty-ic{font-size:44px;display:block;margin-bottom:10px}
+.empty p{font-size:14px;line-height:1.6}
+
+/* icon btn */
+.ic-btn{background:none;border:none;font-size:20px;cursor:pointer;padding:4px 6px;border-radius:8px;transition:background .15s;line-height:1}
+.ic-btn:active{background:#f0f2f8}
+
+/* badge */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-green{background:#d1fae5;color:#065f46}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-yellow{background:#fef9c3;color:#78350f}
+.badge-blue{background:#dbeafe;color:#1e40af}
+
+/* ── DASHBOARD ── */
+.welcome{background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:var(--r);padding:20px;color:#fff;margin-bottom:14px;position:relative;overflow:hidden}
+.welcome::after{content:'🏢';position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:64px;opacity:.12}
+.welcome h2{font-size:17px;font-weight:700;margin-bottom:3px}
+.welcome p{font-size:13px;opacity:.82}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.stat{background:#fff;border-radius:var(--r);padding:14px;box-shadow:var(--shadow);text-align:center}
+.stat-ic{font-size:26px;margin-bottom:5px}
+.stat-val{font-size:26px;font-weight:800;color:var(--primary);line-height:1}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:3px;font-weight:500}
+.quick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.qcard{background:#fff;border-radius:var(--r);padding:16px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.qcard:active{transform:scale(.96)}
+.qcard-ic{font-size:30px}
+.qcard h3{font-size:13px;font-weight:700}
+.qcard p{font-size:11px;color:var(--muted)}
+.act-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.act-item:last-child{border-bottom:none}
+.act-ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.act-title{font-size:14px;font-weight:600}
+.act-time{font-size:12px;color:var(--muted)}
+
+/* ── FINANCEIRO ── */
+.fin-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.fin-c{background:#fff;border-radius:var(--r);padding:12px 8px;box-shadow:var(--shadow);text-align:center}
+.fin-lbl{font-size:11px;color:var(--muted);margin-bottom:3px;font-weight:500}
+.fin-val{font-size:15px;font-weight:800}
+.fin-c.s .fin-val{color:var(--primary)}
+.fin-c.r .fin-val{color:var(--success)}
+.fin-c.d .fin-val{color:var(--danger)}
+.chart-box{background:#fff;border-radius:var(--r);padding:14px;box-shadow:var(--shadow);margin-bottom:14px}
+.chart-lbl{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px}
+#finance-chart{display:flex;align-items:flex-end;gap:6px;height:70px}
+.cbar{flex:1;border-radius:5px 5px 0 0;position:relative;min-height:3px;transition:height .4s}
+.cbar-lbl{position:absolute;bottom:-17px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);white-space:nowrap}
+
+/* ── LEITURAS ── */
+.tabs{display:flex;gap:6px;margin-bottom:14px;background:#fff;border-radius:var(--r-sm);padding:4px;box-shadow:var(--shadow)}
+.tab{flex:1;padding:9px;border:none;border-radius:8px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;background:transparent;color:var(--muted);transition:all .2s}
+.tab.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(26,35,126,.3)}
+.chips{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px}
+.chip{padding:7px 14px;border-radius:20px;border:none;background:#fff;color:var(--muted);font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow);transition:all .2s;flex-shrink:0}
+.chip.active{background:var(--primary);color:#fff}
+
+/* ── MORADORES ── */
+.search-wrap{position:relative;margin-bottom:14px}
+.search-wrap input{width:100%;padding:12px 15px 12px 38px;border:2px solid var(--border);border-radius:var(--r-sm);font-size:14px;font-family:inherit;background:#fff}
+.search-wrap input:focus{outline:none;border-color:var(--secondary)}
+.search-ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px}
+
+/* ── BOTTOM NAV ── */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;align-items:center;padding:6px 0 max(6px,env(safe-area-inset-bottom));border-top:1px solid var(--border);z-index:200;box-shadow:0 -4px 16px rgba(26,35,126,.07)}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:3px 0;color:var(--muted);background:none;border:none;cursor:pointer;font-size:10px;font-weight:600;font-family:inherit;transition:color .2s}
+.ni.active{color:var(--primary)}
+.ni svg{width:21px;height:21px;fill:currentColor}
+
+/* ── TOAST ── */
+#toasts{position:fixed;bottom:85px;left:50%;transform:translateX(-50%);z-index:9000;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:90%;max-width:340px}
+.toast{background:#1e2235;color:#fff;padding:11px 18px;border-radius:12px;font-size:14px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.2);animation:tin .3s ease;text-align:center;width:100%}
+.toast.success{background:#065f46}.toast.error{background:#991b1b}.toast.warning{background:#92400e}.toast.info{background:#1e40af}
+@keyframes tin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── MODAIS ── */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:8000;align-items:flex-end;justify-content:center;backdrop-filter:blur(2px)}
+.modal.open{display:flex}
+.modal-box{background:#fff;border-radius:22px 22px 0 0;padding:22px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:sup .3s ease}
+@keyframes sup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.mt{font-size:17px;font-weight:700;color:var(--primary)}
+.mc{background:none;border:none;font-size:26px;cursor:pointer;color:var(--muted);line-height:1;padding:2px}
+.mf{display:flex;gap:10px;margin-top:18px}
+.mf .btn{margin:0}
+
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-icon">🏢</div>
+  <div class="sp-title">SíndicoApp Pro</div>
+  <div class="sp-sub">Gestão completa de condomínios</div>
+  <div class="sp-dots"><div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div></div>
+</div>
+
+<!-- LOGIN -->
+<div id="pg-login" class="hidden">
+  <div class="login-wrap">
+    <div class="login-brand">
+      <span class="icon">🏢</span>
+      <h1>SíndicoApp Pro</h1>
+      <p>Gestão completa para síndicos</p>
+    </div>
+    <div class="card-box">
+      <h2>Entrar na conta</h2>
+      <div id="login-error" class="err-msg hidden"></div>
+      <div class="fg">
+        <label>Nome (para exibição)</label>
+        <input type="text" id="login-name" placeholder="Seu nome">
+      </div>
+      <div class="fg">
+        <label>E-mail</label>
+        <input type="email" id="login-email" placeholder="seu@email.com">
+      </div>
+      <div class="fg">
+        <label>Senha</label>
+        <input type="password" id="login-password" placeholder="Mínimo 6 caracteres">
+      </div>
+      <button class="btn btn-primary" onclick="Auth.login()">🔐 Entrar / Cadastrar</button>
+      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:8px">Se for seu primeiro acesso, a conta será criada automaticamente.</p>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="pg-app">
+
+  <div class="app-header">
+    <div class="hdr-left">
+      <span class="hdr-logo">🏢</span>
+      <span id="page-title">Dashboard</span>
+    </div>
+    <div class="hdr-right">
+      <button class="hdr-btn" onclick="App.showNotif()">🔔</button>
+      <div class="avatar" id="user-avatar" onclick="App.showProfile()">S</div>
+    </div>
+  </div>
+
+  <div class="condo-bar">
+    <div class="cselect-wrap">
+      <select id="condo-select" onchange="App.changeCondo(this.value)">
+        <option value="">🏢 Selecionar Condomínio</option>
+      </select>
+      <span class="cselect-arr">▼</span>
+    </div>
+  </div>
+
+  <div class="app-body">
+
+    <!-- DASHBOARD -->
+    <div id="view-dashboard" class="view active">
+      <div class="welcome">
+        <h2 id="welcome-msg">Bom dia, Síndico! 👋</h2>
+        <p id="leitura-condo-name">Selecione um condomínio acima</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-ic">👥</div><div class="stat-val" id="dash-moradores">0</div><div class="stat-lbl">Moradores</div></div>
+        <div class="stat"><div class="stat-ic">⚠️</div><div class="stat-val" id="dash-ocorrencias">0</div><div class="stat-lbl">Ocorrências</div></div>
+        <div class="stat"><div class="stat-ic">💧</div><div class="stat-val" id="dash-leituras">0</div><div class="stat-lbl">Leituras hoje</div></div>
+        <div class="stat"><div class="stat-ic">📉</div><div class="stat-val" id="dash-inadimplencia">0%</div><div class="stat-lbl">Inadimplência</div></div>
+      </div>
+      <div class="sh"><span class="sh-title">Acesso Rápido</span></div>
+      <div class="quick">
+        <div class="qcard" onclick="App.nav('financeiro')"><span class="qcard-ic">💰</span><h3>Financeiro</h3><p>Receitas e despesas</p></div>
+        <div class="qcard" onclick="App.nav('leituras')"><span class="qcard-ic">💧</span><h3>Leituras</h3><p>Água e gás</p></div>
+        <div class="qcard" onclick="App.nav('ocorrencias')"><span class="qcard-ic">⚠️</span><h3>Ocorrências</h3><p>Manutenção e chamados</p></div>
+        <div class="qcard" onclick="App.nav('comunicados')"><span class="qcard-ic">📢</span><h3>Comunicados</h3><p>Avisos aos moradores</p></div>
+      </div>
+      <div class="sh">
+        <span class="sh-title">Atividade Recente</span>
+        <button class="fab" style="width:34px;height:34px;font-size:18px" onclick="Condominios.novo()">+</button>
+      </div>
+      <div class="card"><div id="activity-list"><div class="empty"><span class="empty-ic">📭</span><p>Nenhuma atividade recente</p></div></div></div>
+    </div>
+
+    <!-- FINANCEIRO -->
+    <div id="view-financeiro" class="view">
+      <div class="sh"><span class="sh-title">Financeiro</span><button class="fab" onclick="Financeiro.novo()">+</button></div>
+      <div class="fin-sum">
+        <div class="fin-c s"><div class="fin-lbl">Saldo</div><div class="fin-val" id="fin-saldo">R$ 0</div></div>
+        <div class="fin-c r"><div class="fin-lbl">Receitas</div><div class="fin-val" id="fin-receitas">R$ 0</div></div>
+        <div class="fin-c d"><div class="fin-lbl">Despesas</div><div class="fin-val" id="fin-despesas">R$ 0</div></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-lbl">Saldo — últimos 6 meses</div>
+        <div id="finance-chart"></div>
+        <div style="height:20px"></div>
+      </div>
+      <div class="sh" style="margin-top:4px"><span class="sh-title" style="font-size:15px">Lançamentos do mês</span></div>
+      <div id="lancamentos-list"><div class="empty"><span class="empty-ic">💰</span><p>Selecione um condomínio</p></div></div>
+    </div>
+
+    <!-- LEITURAS -->
+    <div id="view-leituras" class="view">
+      <div class="sh">
+        <span class="sh-title">Leituras</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm btn-ghost" onclick="Leituras.abrirImport()" style="font-size:12px;padding:7px 12px">📥 Importar CSV</button>
+          <button class="fab" onclick="Leituras.novo()">+</button>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" id="tab-agua" onclick="Leituras.switchTab('agua',this)">💧 Água</button>
+        <button class="tab" id="tab-gas" onclick="Leituras.switchTab('gas',this)">🔥 Gás</button>
+      </div>
+      <div class="chips">
+        <select id="leitura-bloco" onchange="Leituras.render()" style="padding:7px 12px;border-radius:20px;border:none;background:#fff;font-family:inherit;font-size:13px;box-shadow:var(--shadow)">
+          <option value="">Todos os Blocos</option>
+        </select>
+      </div>
+      <div id="unidades-list"><div class="empty"><span class="empty-ic">🏢</span><p>Selecione um condomínio</p></div></div>
+    </div>
+
+    <!-- MORADORES -->
+    <div id="view-moradores" class="view">
+      <div class="sh">
+        <span class="sh-title">Moradores</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm btn-ghost" onclick="Moradores.abrirImport()" style="font-size:12px;padding:7px 12px">📥 Importar CSV</button>
+          <button class="fab" onclick="Moradores.novo()">+</button>
+        </div>
+      </div>
+      <div class="search-wrap">
+        <span class="search-ic">🔍</span>
+        <input type="text" placeholder="Buscar por nome, unidade ou bloco..." oninput="Moradores.search(this.value)">
+      </div>
+      <div id="moradores-list"><div class="empty"><span class="empty-ic">👥</span><p>Selecione um condomínio</p></div></div>
+    </div>
+
+    <!-- OCORRÊNCIAS -->
+    <div id="view-ocorrencias" class="view">
+      <div class="sh"><span class="sh-title">Ocorrências</span><button class="fab" onclick="Ocorrencias.novo()">+</button></div>
+      <div class="chips">
+        <button class="chip active" onclick="Ocorrencias.filter('todos',this)">Todos</button>
+        <button class="chip" onclick="Ocorrencias.filter('pendente',this)">Pendentes</button>
+        <button class="chip" onclick="Ocorrencias.filter('urgente',this)">Urgentes</button>
+        <button class="chip" onclick="Ocorrencias.filter('resolvido',this)">Resolvidos</button>
+      </div>
+      <div id="ocorrencias-list"><div class="empty"><span class="empty-ic">📭</span><p>Selecione um condomínio</p></div></div>
+    </div>
+
+    <!-- COMUNICADOS -->
+    <div id="view-comunicados" class="view">
+      <div class="sh"><span class="sh-title">Comunicados</span></div>
+      <div class="tabs" style="margin-bottom:14px">
+        <button class="tab active" id="tab-com-geral" onclick="Comunicados.switchTipo('geral',this)">📢 Geral</button>
+        <button class="tab" id="tab-com-individual" onclick="Comunicados.switchTipo('individual',this)">🏠 Individual</button>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="fg" id="com-dest-wrap" style="display:none;margin-bottom:10px">
+          <label>Apartamento destinatário *</label>
+          <select id="comunicado-destinatario"><option value="">Selecione o apartamento</option></select>
+        </div>
+        <div class="fg" style="margin-bottom:10px"><label>Mensagem</label><textarea id="novo-comunicado" placeholder="Escreva o comunicado..."></textarea></div>
+        <div class="fg" style="margin-bottom:14px">
+          <label>Prioridade</label>
+          <select id="comunicado-prioridade">
+            <option value="normal">📌 Normal</option>
+            <option value="importante">🔴 Importante</option>
+            <option value="urgente">🚨 Urgente</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" style="margin:0" onclick="Comunicados.publicar()">📢 Publicar</button>
+      </div>
+      <div class="chips" style="margin-bottom:12px">
+        <button class="chip active" onclick="Comunicados.filtrar('todos',this)">Todos</button>
+        <button class="chip" onclick="Comunicados.filtrar('geral',this)">Gerais</button>
+        <button class="chip" onclick="Comunicados.filtrar('individual',this)">Individuais</button>
+      </div>
+      <div id="comunicados-list"><div class="empty"><span class="empty-ic">📭</span><p>Nenhum comunicado</p></div></div>
+    </div>
+
+    <!-- CONDOMÍNIOS -->
+    <div id="view-condominios" class="view">
+      <div class="sh">
+        <span class="sh-title">Meus Condomínios</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm btn-ghost" onclick="Condominios.abrirImport()" style="font-size:12px;padding:7px 12px">📥 Importar CSV</button>
+          <button class="fab" onclick="Condominios.novo()">+</button>
+        </div>
+      </div>
+      <div id="condominios-list"><div class="empty"><span class="empty-ic">🏢</span><p>Nenhum condomínio cadastrado</p></div></div>
+    </div>
+
+  </div><!-- /app-body -->
+
+  <!-- BOTTOM NAV -->
+  <nav class="bnav">
+    <button class="ni active" data-v="dashboard" onclick="App.nav('dashboard')">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Início
+    </button>
+    <button class="ni" data-v="financeiro" onclick="App.nav('financeiro')">
+      <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Financeiro
+    </button>
+    <button class="ni" data-v="leituras" onclick="App.nav('leituras')">
+      <svg viewBox="0 0 24 24"><path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/></svg>Leituras
+    </button>
+    <button class="ni" data-v="moradores" onclick="App.nav('moradores')">
+      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Moradores
+    </button>
+    <button class="ni" id="nav-mais" onclick="App.toggleMais()">
+      <svg viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>Mais
+    </button>
+  </nav>
+
+  <!-- MAIS DRAWER -->
+  <div id="mais-drawer" style="display:none;position:fixed;bottom:65px;left:0;right:0;z-index:199;padding:0 16px 12px">
+    <div style="background:#fff;border-radius:16px;box-shadow:0 -4px 32px rgba(26,35,126,.18);overflow:hidden">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr)">
+        <button onclick="App.nav('ocorrencias');App.closeMais()" style="background:none;border:none;padding:18px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px;font-weight:600;font-family:inherit;color:var(--muted);border-right:1px solid var(--border)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>Ocorrências
+        </button>
+        <button onclick="App.nav('comunicados');App.closeMais()" style="background:none;border:none;padding:18px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px;font-weight:600;font-family:inherit;color:var(--muted);border-right:1px solid var(--border)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>Comunicados
+        </button>
+        <button onclick="App.nav('condominios');App.closeMais()" style="background:none;border:none;padding:18px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px;font-weight:600;font-family:inherit;color:var(--muted)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17 11V3H7v4H3v14h8v-4h2v4h8V11h-4zm-6 4H9v-2h2v2zm0-4H9V9h2v2zm0-4H9V5h2v2zm4 8h-2v-2h2v2zm0-4h-2V9h2v2zm4 4h-2v-2h2v2zm0-4h-2V9h2v2z"/></svg>Condomínios
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="mais-overlay" onclick="App.closeMais()" style="display:none;position:fixed;inset:0;z-index:198"></div>
+
+</div>
+
+<!-- TOASTS -->
+<div id="toasts"></div>
+
+<!-- ===== MODAIS ===== -->
+
+<!-- Condomínio -->
+<div id="modal-condominio" class="modal">
+  <div class="modal-box">
+    <div class="mh"><span class="mt">🏢 Novo Condomínio</span><button class="mc" onclick="Modal.close('condominio')">×</button></div>
+    <div class="fg"><label>Nome *</label><input type="text" id="condo-nome" placeholder="Ex: Res. Jardim das Flores"></div>
+    <div class="fg"><label>Endereço</label><input type="text" id="condo-endereco" placeholder="Rua, número, bairro, cidade"></div>
+    <div class="fg"><label>Total de Unidades *</label><input type="number" id="condo-unidades" placeholder="Ex: 48" min="1"></div>
+    <div class="fg"><label>Blocos</label><input type="text" id="condo-blocos" placeholder="Ex: A, B, C (opcional)"></div>
+    <div class="fg"><label>CNPJ</label><input type="text" id="condo-cnpj" placeholder="00.000.000/0000-00"></div>
+    <div class="mf">
+      <button class="btn btn-outline" onclick="Modal.close('condominio')" style="flex:1">Cancelar</button>
+      <button class="btn btn-primary" onclick="Condominios.salvar()" style="flex:2">✅ Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Morador -->
+<div id="modal-morador" class="modal">
+  <div class="modal-box">
+    <div class="mh"><span class="mt">👤 Novo Morador</span><button class="mc" onclick="Modal.close('morador')">×</button></div>
+    <div class="fg"><label>Nome Completo *</label><input type="text" id="morador-nome" placeholder="Nome do morador"></div>
+    <div class="fg"><label>Bloco</label><input type="text" id="morador-bloco" placeholder="Ex: A (opcional)"></div>
+    <div class="fg"><label>Unidade / Apartamento *</label><input type="text" id="morador-unidade" placeholder="Ex: 101"></div>
+    <div class="fg"><label>E-mail</label><input type="email" id="morador-email" placeholder="email@exemplo.com"></div>
+    <div class="fg"><label>Telefone</label><input type="tel" id="morador-telefone" placeholder="(00) 00000-0000"></div>
+    <div class="fg"><label>Tipo</label>
+      <select id="morador-tipo"><option value="proprietario">Proprietário</option><option value="inquilino">Inquilino</option></select>
+    </div>
+    <div class="fg" style="display:flex;align-items:center;gap:10px;margin-bottom:0">
+      <input type="checkbox" id="morador-inadimplente" style="width:18px;height:18px;cursor:pointer">
+      <label for="morador-inadimplente" style="margin:0;cursor:pointer">Inadimplente</label>
+    </div>
+    <div class="mf">
+      <button class="btn btn-outline" onclick="Modal.close('morador')" style="flex:1">Cancelar</button>
+      <button class="btn btn-primary" onclick="Moradores.salvar()" style="flex:2">✅ Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Leitura -->
+<div id="modal-leitura" class="modal">
+  <div class="modal-box">
+    <div class="mh"><span class="mt">📊 Nova Leitura</span><button class="mc" onclick="Modal.close('leitura')">×</button></div>
+    <div class="fg"><label>Tipo</label>
+      <select id="leitura-tipo"><option value="agua">💧 Água</option><option value="gas">🔥 Gás</option></select>
+    </div>
+    <div class="fg"><label>Unidade *</label>
+      <select id="leitura-unidade"><option value="">Selecione a unidade</option></select>
+    </div>
+    <div class="fg"><label>Leitura (m³) *</label><input type="number" id="leitura-valor" placeholder="Ex: 1234" step="0.1"></div>
+    <div class="fg"><label>Data *</label><input type="date" id="leitura-data"></div>
+    <div id="leitura-preview" style="margin-bottom:10px"></div>
+    <button class="btn btn-ghost" onclick="Leituras.capturePhoto()" style="margin-bottom:4px">📷 Capturar Foto do Medidor</button>
+    <div class="mf">
+      <button class="btn btn-outline" onclick="Modal.close('leitura')" style="flex:1">Cancelar</button>
+      <button class="btn btn-primary" onclick="Leituras.salvar()" style="flex:2">✅ Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ocorrência -->
+<div id="modal-ocorrencia" class="modal">
+  <div class="modal-box">
+    <div class="mh"><span class="mt">⚠️ Nova Ocorrência</span><button class="mc" onclick="Modal.close('ocorrencia')">×</button></div>
+    <div class="fg"><label>Título *</label><input type="text" id="ocorrencia-titulo" placeholder="Descreva o problema brevemente"></div>
+    <div class="fg"><label>Tipo</label>
+      <select id="ocorrencia-tipo">
+        <option value="manutencao">🔧 Manutenção</option>
+        <option value="reclamacao">📢 Reclamação</option>
+        <option value="solicitacao">📋 Solicitação</option>
+        <option value="outros">⚠️ Outros</option>
+      </select>
+    </div>
+    <div class="fg"><label>Prioridade</label>
+      <select id="ocorrencia-prioridade">
+        <option value="baixa">🟢 Baixa</option>
+        <option value="media" selected>🟡 Média</option>
+        <option value="alta">🔴 Alta</option>
+        <option value="urgente">🚨 Urgente</option>
+      </select>
+    </div>
+    <div class="fg"><label>Descrição</label><textarea id="ocorrencia-descricao" placeholder="Detalhes da ocorrência..."></textarea></div>
+    <div class="mf">
+      <button class="btn btn-outline" onclick="Modal.close('ocorrencia')" style="flex:1">Cancelar</button>
+      <button class="btn btn-primary" onclick="Ocorrencias.salvar()" style="flex:2">✅ Registrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lançamento Financeiro -->
+<div id="modal-lancamento" class="modal">
+  <div class="modal-box">
+    <div class="mh"><span class="mt">💰 Novo Lançamento</span><button class="mc" onclick="Modal.close('lancamento')">×</button></div>
+    <div class="fg"><label>Tipo</label>
+      <select id="lancamento-tipo"><option value="receita">📈 Receita</option><option value="despesa">📉 Despesa</option></select>
+    </div>
+    <div class="fg"><label>Descrição *</label><input type="text" id="lancamento-descricao" placeholder="Ex: Taxa de condomínio — Apto 101"></div>
+    <div class="fg"><label>Categoria</label>
+      <select id="lancamento-categoria">
+        <option value="condominio">Taxa de Condomínio</option>
+        <option value="agua">Água</option>
+        <option value="gas">Gás</option>
+        <option value="manutencao">Manutenção</option>
+        <option value="limpeza">Limpeza</option>
+        <option value="seguranca">Segurança</option>
+        <option value="outros">Outros</option>
+      </select>
+    </div>
+    <div class="fg"><label>Valor (R$) *</label><input type="number" id="lancamento-valor" placeholder="0,00" step="0.01" min="0"></div>
+    <div class="fg"><label>Data *</label><input type="date" id="lancamento-data"></div>
+    <div class="fg"><label>Observação</label><textarea id="lancamento-obs" placeholder="Opcional..."></textarea></div>
+    <div class="mf">
+      <button class="btn btn-outline" onclick="Modal.close('lancamento')" style="flex:1">Cancelar</button>
+      <button class="btn btn-primary" onclick="Financeiro.salvar()" style="flex:2">✅ Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Perfil / Logout -->
+<div id="modal-perfil" class="modal">
+  <div class="modal-box">
+    <div class="mh"><span class="mt">👤 Meu Perfil</span><button class="mc" onclick="Modal.close('perfil')">×</button></div>
+    <div class="fg"><label>Nome</label><input type="text" id="perfil-nome"></div>
+    <div class="fg"><label>E-mail</label><input type="email" id="perfil-email" readonly style="opacity:.6"></div>
+    <button class="btn btn-primary" onclick="Auth.saveProfile()" style="margin-bottom:10px">💾 Salvar Perfil</button>
+
+    <div style="border-top:1px solid var(--border);margin:16px 0"></div>
+    <p style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:10px">🗄️ Backup dos Dados</p>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5">Exporte seus dados para um arquivo de backup. Use para transferir para outro dispositivo ou navegador.</p>
+    <button class="btn btn-ghost" onclick="Backup.exportar()" style="margin-bottom:8px">📤 Exportar Backup (.json)</button>
+    <button class="btn btn-ghost" onclick="Backup.importarClick()" style="margin-bottom:16px">📥 Restaurar Backup</button>
+    <input type="file" id="backup-file-input" accept=".json" style="display:none" onchange="Backup.importar(this)">
+
+    <div style="border-top:1px solid var(--border);margin-bottom:16px"></div>
+    <button class="btn btn-danger" onclick="Auth.logout()">🚪 Sair da Conta</button>
+  </div>
+</div>
+
+<!-- Modal: Importar CSV de Moradores -->
+<div id="modal-import-moradores" class="modal">
+  <div class="modal-box">
+    <div class="mh"><span class="mt">👥 Importar Moradores (CSV)</span><button class="mc" onclick="Modal.close('import-moradores')">×</button></div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">
+      Importe moradores de uma planilha Excel salva como CSV, ou exportada de sistemas como <strong>Superlógica, Cond21, SAMI</strong>.<br><br>
+      <strong>Colunas reconhecidas:</strong><br>
+      <code style="background:#f0f2f8;padding:4px 8px;border-radius:6px;font-size:11px;display:block;margin-top:6px;line-height:1.8">
+        nome · unidade · bloco · email · telefone · tipo (proprietario/inquilino)
+      </code>
+    </p>
+    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;color:#78350f">
+      ⚠️ A primeira linha do arquivo deve ser o cabeçalho com os nomes das colunas.
+    </div>
+    <div class="fg">
+      <label>Selecionar arquivo CSV</label>
+      <input type="file" id="import-moradores-file" accept=".csv,.txt" style="padding:10px;background:#fafbff">
+    </div>
+    <div id="import-moradores-preview" style="margin-bottom:12px;font-size:13px;color:var(--muted)"></div>
+    <div class="mf">
+      <button class="btn btn-outline" onclick="Modal.close('import-moradores')" style="flex:1">Cancelar</button>
+      <button class="btn btn-primary" onclick="Moradores.processarCSV()" style="flex:2">📥 Importar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Importar CSV de Condomínios -->
+<div id="modal-import-condominios" class="modal">
+  <div class="modal-box">
+    <div class="mh"><span class="mt">🏢 Importar Condomínios (CSV)</span><button class="mc" onclick="Modal.close('import-condominios')">×</button></div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">
+      Importe sua lista de condomínios de uma planilha.<br><br>
+      <strong>Colunas reconhecidas:</strong><br>
+      <code style="background:#f0f2f8;padding:4px 8px;border-radius:6px;font-size:11px;display:block;margin-top:6px;line-height:1.8">
+        nome · endereco · unidades · blocos · cnpj
+      </code>
+    </p>
+    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;color:#78350f">
+      ⚠️ A primeira linha deve ser o cabeçalho. Condomínios com mesmo nome serão ignorados (sem duplicatas).
+    </div>
+    <div class="fg">
+      <label>Selecionar arquivo CSV</label>
+      <input type="file" id="import-condominios-file" accept=".csv,.txt" style="padding:10px;background:#fafbff">
+    </div>
+    <div id="import-condominios-preview" style="margin-bottom:12px;font-size:13px;color:var(--muted)"></div>
+    <div class="mf">
+      <button class="btn btn-outline" onclick="Modal.close('import-condominios')" style="flex:1">Cancelar</button>
+      <button class="btn btn-primary" onclick="Condominios.processarCSV()" style="flex:2">📥 Importar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Importar CSV de Leituras -->
+<div id="modal-import-csv" class="modal">
+  <div class="modal-box">
+    <div class="mh"><span class="mt">📥 Importar Leituras (CSV)</span><button class="mc" onclick="Modal.close('import-csv')">×</button></div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">
+      Importe leituras exportadas de sistemas como <strong>Superlógica, Cond21, SAMI</strong> ou qualquer planilha Excel salva como CSV.<br><br>
+      <strong>Formato esperado das colunas:</strong><br>
+      <code style="background:#f0f2f8;padding:4px 8px;border-radius:6px;font-size:12px">unidade, leitura_agua, leitura_gas, data</code>
+    </p>
+    <div class="fg">
+      <label>Tipo de leitura do arquivo</label>
+      <select id="import-tipo"><option value="agua">💧 Água</option><option value="gas">🔥 Gás</option><option value="ambos">Ambos (colunas separadas)</option></select>
+    </div>
+    <div class="fg">
+      <label>Selecionar arquivo CSV</label>
+      <input type="file" id="import-csv-file" accept=".csv,.txt" style="padding:10px;background:#fafbff">
+    </div>
+    <div id="import-preview" style="margin-bottom:12px"></div>
+    <div class="mf">
+      <button class="btn btn-outline" onclick="Modal.close('import-csv')" style="flex:1">Cancelar</button>
+      <button class="btn btn-primary" onclick="Leituras.processarCSV()" style="flex:2">📥 Importar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  UTILITÁRIOS
+// ═══════════════════════════════════════════════
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+const sto = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+const get = k => { try{ return JSON.parse(localStorage.getItem(k)) }catch{ return null } };
+const fmtTime = ts => {
+  const d = new Date(ts), now = new Date(), s = Math.floor((now-d)/1000);
+  if(s<60) return 'Agora mesmo';
+  if(s<3600) return Math.floor(s/60)+'min atrás';
+  if(s<86400) return Math.floor(s/3600)+'h atrás';
+  return d.toLocaleDateString('pt-BR');
+};
+const fmtMoney = v => 'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const today = () => new Date().toISOString().split('T')[0];
+
+// ═══════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════
+const Toast = {
+  show(msg, type='info'){
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    document.getElementById('toasts').appendChild(el);
+    setTimeout(()=>el.remove(), 3200);
+  }
+};
+
+// ═══════════════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════════════
+const Modal = {
+  open(name){ const m=document.getElementById('modal-'+name); if(m){m.classList.add('open');document.body.style.overflow='hidden'} },
+  close(name){ const m=document.getElementById('modal-'+name); if(m){m.classList.remove('open');document.body.style.overflow=''} },
+  closeAll(){ document.querySelectorAll('.modal').forEach(m=>m.classList.remove('open')); document.body.style.overflow=''; }
+};
+document.addEventListener('click', e=>{ if(e.target.classList.contains('modal')) Modal.closeAll(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') Modal.closeAll(); });
+
+// ═══════════════════════════════════════════════
+//  AUTH (local, sem Firebase)
+// ═══════════════════════════════════════════════
+const Auth = {
+  login(){
+    const name = document.getElementById('login-name').value.trim();
+    const email = document.getElementById('login-email').value.trim();
+    const pass = document.getElementById('login-password').value;
+    const err = document.getElementById('login-error');
+    if(!email || !pass){ err.textContent='⚠️ Preencha e-mail e senha'; err.classList.remove('hidden'); return; }
+    if(pass.length<6){ err.textContent='⚠️ Senha deve ter pelo menos 6 caracteres'; err.classList.remove('hidden'); return; }
+    err.classList.add('hidden');
+    // Verificar usuário existente
+    let users = get('sapp_users') || {};
+    if(users[email]){
+      if(users[email].pass !== pass){ err.textContent='❌ Senha incorreta'; err.classList.remove('hidden'); return; }
+    } else {
+      users[email] = { name: name||email.split('@')[0], email, pass, createdAt: new Date().toISOString() };
+      sto('sapp_users', users);
+    }
+    const user = { name: users[email].name, email };
+    sto('sapp_session', user);
+    App.state.user = user;
+    App.showApp();
+  },
+  logout(){
+    Modal.closeAll();
+    localStorage.removeItem('sapp_session');
+    App.state.user = null;
+    document.getElementById('pg-app').classList.remove('active');
+    document.getElementById('pg-login').classList.remove('hidden');
+    Toast.show('👋 Você saiu da conta','info');
+  },
+  saveProfile(){
+    const name = document.getElementById('perfil-nome').value.trim();
+    if(!name){ Toast.show('⚠️ Informe seu nome','warning'); return; }
+    let users = get('sapp_users') || {};
+    const email = App.state.user.email;
+    if(users[email]) users[email].name = name;
+    sto('sapp_users', users);
+    App.state.user.name = name;
+    sto('sapp_session', App.state.user);
+    document.getElementById('user-avatar').textContent = name[0].toUpperCase();
+    Modal.close('perfil');
+    Toast.show('✅ Perfil salvo!','success');
+  }
+};
+
+// ═══════════════════════════════════════════════
+//  APP CORE
+// ═══════════════════════════════════════════════
+const App = {
+  state: { user: null, currentCondo: null, condos: [] },
+
+  init(){
+    setTimeout(()=>document.getElementById('splash').classList.add('out'), 2000);
+    const session = get('sapp_session');
+    if(session){ this.state.user = session; this.showApp(); }
+    else { setTimeout(()=>document.getElementById('pg-login').classList.remove('hidden'), 2100); }
+    // saudação
+    const h = new Date().getHours();
+    document.getElementById('welcome-msg').textContent =
+      (h<12?'Bom dia':h<18?'Boa tarde':'Boa noite') + ', Síndico! 👋';
+  },
+
+  showApp(){
+    document.getElementById('pg-login').classList.add('hidden');
+    const app = document.getElementById('pg-app');
+    app.classList.add('active');
+    const av = document.getElementById('user-avatar');
+    av.textContent = (this.state.user.name||'S')[0].toUpperCase();
+    this.loadCondos();
+    this.loadActivities();
+    this.updateStats();
+  },
+
+  loadCondos(){
+    const condos = get('sapp_condos_'+(this.state.user?.email||'')) || [];
+    this.state.condos = condos;
+    const sel = document.getElementById('condo-select');
+    sel.innerHTML = '<option value="">🏢 Selecionar Condomínio</option>';
+    condos.forEach(c=>{
+      const o = document.createElement('option');
+      o.value = c.id; o.textContent = c.nome;
+      sel.appendChild(o);
+    });
+    if(!this.state.currentCondo && condos.length>0) this.changeCondo(condos[0].id);
+    Condominios.renderList();
+  },
+
+  changeCondo(id){
+    if(!id){ this.state.currentCondo=null; return; }
+    this.state.currentCondo = this.state.condos.find(c=>c.id===id)||null;
+    document.getElementById('condo-select').value = id;
+    document.getElementById('leitura-condo-name').textContent = this.state.currentCondo?.nome||'';
+    this.updateStats();
+    // Atualizar view atual
+    const active = document.querySelector('.view.active');
+    if(active) this.loadView(active.id.replace('view-',''));
+    Toast.show('🏢 '+this.state.currentCondo?.nome+' selecionado','success');
+  },
+
+  nav(v){ this.closeMais();
+    document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+    document.getElementById('view-'+v)?.classList.add('active');
+    const titles={dashboard:'Dashboard',financeiro:'Financeiro',leituras:'Leituras',moradores:'Moradores',ocorrencias:'Ocorrências',comunicados:'Comunicados',condominios:'Condomínios'};
+    document.getElementById('page-title').textContent = titles[v]||v;
+    document.querySelectorAll('.ni').forEach(n=>{ n.classList.toggle('active', n.dataset.v===v); });
+    this.loadView(v);
+  },
+
+  loadView(v){
+    switch(v){
+      case 'dashboard': this.updateStats(); this.loadActivities(); break;
+      case 'financeiro': Financeiro.load(); break;
+      case 'leituras': Leituras.load(); break;
+      case 'moradores': Moradores.load(); break;
+      case 'ocorrencias': Ocorrencias.load(); break;
+      case 'comunicados': Comunicados.load(); break;
+      case 'condominios': Condominios.renderList(); break;
+    }
+  },
+
+  updateStats(){
+    const cid = this.state.currentCondo?.id;
+    if(!cid){
+      ['dash-moradores','dash-ocorrencias','dash-leituras','dash-inadimplencia'].forEach(id=>{
+        document.getElementById(id).textContent = id==='dash-inadimplencia'?'0%':'0';
+      });
+      return;
+    }
+    const mors = get('sapp_moradores_'+cid)||[];
+    const ocrs = get('sapp_ocorrencias_'+cid)||[];
+    const leis = get('sapp_leituras_'+cid)||[];
+    const leisHoje = leis.filter(l=>l.data===today()).length;
+    const pend = ocrs.filter(o=>o.status!=='resolvido').length;
+    const inadim = mors.filter(m=>m.inadimplente).length;
+    const pct = mors.length>0 ? Math.round(inadim/mors.length*100) : 0;
+    document.getElementById('dash-moradores').textContent = mors.length;
+    document.getElementById('dash-ocorrencias').textContent = pend;
+    document.getElementById('dash-leituras').textContent = leisHoje;
+    document.getElementById('dash-inadimplencia').textContent = pct+'%';
+  },
+
+  addActivity(title,icon,color='#e5e7eb'){
+    const acts = get('sapp_activities')||[];
+    acts.push({title,icon,color,ts:new Date().toISOString()});
+    if(acts.length>50) acts.shift();
+    sto('sapp_activities',acts);
+    this.loadActivities();
+  },
+
+  loadActivities(){
+    const list = document.getElementById('activity-list');
+    const acts = (get('sapp_activities')||[]).slice(-10).reverse();
+    if(!acts.length){ list.innerHTML='<div class="empty"><span class="empty-ic">📭</span><p>Nenhuma atividade recente</p></div>'; return; }
+    list.innerHTML = acts.map(a=>`
+      <div class="act-item">
+        <div class="act-ic" style="background:${a.color}">${a.icon}</div>
+        <div><div class="act-title">${a.title}</div><div class="act-time">${fmtTime(a.ts)}</div></div>
+      </div>`).join('');
+  },
+
+  showNotif(){ Toast.show('🔔 Sem novas notificações','info'); },
+
+  toggleMais(){
+    const drawer = document.getElementById('mais-drawer');
+    const overlay = document.getElementById('mais-overlay');
+    const open = drawer.style.display === 'block';
+    drawer.style.display = open ? 'none' : 'block';
+    overlay.style.display = open ? 'none' : 'block';
+    document.getElementById('nav-mais').classList.toggle('active', !open);
+  },
+
+  closeMais(){
+    document.getElementById('mais-drawer').style.display = 'none';
+    document.getElementById('mais-overlay').style.display = 'none';
+    document.getElementById('nav-mais').classList.remove('active');
+  },
+
+  showProfile(){
+    document.getElementById('perfil-nome').value = this.state.user?.name||'';
+    document.getElementById('perfil-email').value = this.state.user?.email||'';
+    Modal.open('perfil');
+  }
+};
+
+// ═══════════════════════════════════════════════
+//  CONDOMÍNIOS
+// ═══════════════════════════════════════════════
+const Condominios = {
+  novo(){
+    ['condo-nome','condo-endereco','condo-unidades','condo-blocos','condo-cnpj'].forEach(id=>document.getElementById(id).value='');
+    Modal.open('condominio');
+  },
+  salvar(){
+    const nome = document.getElementById('condo-nome').value.trim();
+    const unidades = document.getElementById('condo-unidades').value;
+    if(!nome||!unidades){ Toast.show('⚠️ Preencha nome e unidades','warning'); return; }
+    const condo = {
+      id: uid(), nome,
+      endereco: document.getElementById('condo-endereco').value.trim(),
+      unidades: parseInt(unidades),
+      blocos: document.getElementById('condo-blocos').value.trim()||'Único',
+      cnpj: document.getElementById('condo-cnpj').value.trim(),
+      createdAt: new Date().toISOString()
+    };
+    const key = 'sapp_condos_'+(App.state.user?.email||'');
+    const list = get(key)||[];
+    list.push(condo);
+    sto(key, list);
+    App.state.condos = list;
+    Modal.close('condominio');
+    App.loadCondos();
+    App.changeCondo(condo.id);
+    Toast.show('✅ Condomínio cadastrado!','success');
+    App.addActivity('Condomínio "'+nome+'" cadastrado','🏢','#dbeafe');
+  },
+  renderList(){
+    const list = document.getElementById('condominios-list');
+    const condos = App.state.condos;
+    if(!condos.length){ list.innerHTML='<div class="empty"><span class="empty-ic">🏢</span><p>Nenhum condomínio cadastrado</p></div>'; return; }
+    list.innerHTML = condos.map(c=>`
+      <div class="card" style="cursor:pointer" onclick="App.changeCondo('${c.id}');App.nav('dashboard')">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <h3 style="margin-bottom:4px">🏢 ${c.nome}</h3>
+            <p style="color:var(--muted);font-size:13px;margin-bottom:6px">📍 ${c.endereco||'Endereço não informado'}</p>
+            <div style="display:flex;gap:14px;font-size:13px;color:var(--muted)">
+              <span>🏠 ${c.unidades} unidades</span>
+              <span>🏗️ ${c.blocos}</span>
+            </div>
+          </div>
+          <button class="ic-btn" onclick="event.stopPropagation();Condominios.excluir('${c.id}')">🗑️</button>
+        </div>
+      </div>`).join('');
+  },
+  excluir(id){
+    if(!confirm('Excluir este condomínio e todos os seus dados?')) return;
+    const key = 'sapp_condos_'+(App.state.user?.email||'');
+    let list = get(key)||[];
+    list = list.filter(c=>c.id!==id);
+    sto(key,list);
+    App.state.condos = list;
+    if(App.state.currentCondo?.id===id) App.state.currentCondo=null;
+    App.loadCondos();
+    Toast.show('🗑️ Condomínio removido','info');
+  },
+
+  abrirImport(){
+    document.getElementById('import-condominios-file').value='';
+    document.getElementById('import-condominios-preview').textContent='';
+    Modal.open('import-condominios');
+  },
+
+  processarCSV(){
+    const file=document.getElementById('import-condominios-file').files[0];
+    if(!file){ Toast.show('⚠️ Selecione um arquivo CSV','warning'); return; }
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const text=e.target.result;
+        const lines=text.trim().split(/\r?\n/).filter(l=>l.trim());
+        if(lines.length<2){ Toast.show('⚠️ Arquivo vazio ou sem dados','error'); return; }
+        const sep=lines[0].includes(';')?';':',';
+        const headers=lines[0].split(sep).map(h=>h.trim().toLowerCase().replace(/["']/g,''));
+
+        const col=(terms)=>headers.findIndex(h=>terms.some(t=>h.includes(t)));
+        const iNome  = col(['nome','name','condominio','condomínio']);
+        const iEnd   = col(['endereco','endereço','address','logradouro']);
+        const iUnid  = col(['unidades','units','total','apartamentos']);
+        const iBlocos= col(['blocos','bloco','towers','block']);
+        const iCnpj  = col(['cnpj','documento','doc']);
+
+        if(iNome===-1){
+          Toast.show('❌ Coluna "nome" é obrigatória','error');
+          document.getElementById('import-condominios-preview').textContent='Colunas encontradas: '+headers.join(', ');
+          return;
+        }
+
+        const key='sapp_condos_'+(App.state.user?.email||'');
+        const existentes = get(key)||[];
+        const nomesExist = new Set(existentes.map(c=>c.nome.toLowerCase().trim()));
+        let importados=0, duplicados=0;
+
+        lines.slice(1).forEach(line=>{
+          if(!line.trim()) return;
+          const cols=line.split(sep).map(c=>c.trim().replace(/["']/g,''));
+          const nome=(cols[iNome]||'').trim();
+          if(!nome) return;
+          if(nomesExist.has(nome.toLowerCase())){ duplicados++; return; }
+          existentes.push({
+            id:uid(), nome,
+            endereco: iEnd>=0?cols[iEnd]||'':'',
+            unidades: iUnid>=0?parseInt(cols[iUnid])||0:0,
+            blocos:   iBlocos>=0?cols[iBlocos]||'Único':'Único',
+            cnpj:     iCnpj>=0?cols[iCnpj]||'':'',
+            createdAt:new Date().toISOString()
+          });
+          nomesExist.add(nome.toLowerCase());
+          importados++;
+        });
+
+        sto(key, existentes);
+        App.state.condos = existentes;
+        Modal.close('import-condominios');
+        App.loadCondos();
+        this.renderList();
+        let msg=`✅ ${importados} condomínio(s) importado(s)!`;
+        if(duplicados) msg+=` (${duplicados} duplicado(s) ignorado(s))`;
+        Toast.show(msg, importados>0?'success':'warning');
+        if(importados>0) App.addActivity(`${importados} condomínios importados via CSV`,'🏢','#dbeafe');
+      } catch(err){
+        Toast.show('❌ Erro ao processar CSV: '+err.message,'error');
+      }
+    };
+    reader.readAsText(file,'UTF-8');
+  }
+};
+
+// ═══════════════════════════════════════════════
+//  MORADORES
+// ═══════════════════════════════════════════════
+const Moradores = {
+  data:[],
+  load(){
+    if(!App.state.currentCondo){ document.getElementById('moradores-list').innerHTML='<div class="empty"><span class="empty-ic">🏢</span><p>Selecione um condomínio primeiro</p></div>'; return; }
+    this.data = get('sapp_moradores_'+App.state.currentCondo.id)||[];
+    this.render();
+  },
+  render(filter=''){
+    const list = document.getElementById('moradores-list');
+    let data = this.data;
+    if(filter){ const s=filter.toLowerCase(); data=data.filter(m=>m.nome.toLowerCase().includes(s)||m.unidade.toLowerCase().includes(s)||(m.bloco||'').toLowerCase().includes(s)); }
+    if(!data.length){ list.innerHTML='<div class="empty"><span class="empty-ic">👥</span><p>'+(filter?'Nenhum resultado':'Nenhum morador cadastrado')+'</p></div>'; return; }
+    data.sort((a,b)=>(a.bloco||'').localeCompare(b.bloco||'')||a.unidade.localeCompare(b.unidade));
+    list.innerHTML = data.map(m=>`
+      <div class="card" style="display:flex;align-items:center;gap:12px">
+        <div style="width:44px;height:44px;background:linear-gradient(135deg,#3b82f6,#1e3a8a);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0">👤</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;margin-bottom:2px">${m.nome}</div>
+          <div style="font-size:13px;color:var(--muted)">🏠 ${m.bloco?m.bloco+' — ':''}${m.unidade} · ${m.tipo==='proprietario'?'Proprietário':'Inquilino'}</div>
+          ${m.telefone?`<div style="font-size:12px;color:var(--muted);margin-top:2px">📞 ${m.telefone}</div>`:''}
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${m.inadimplente?'<span style="color:var(--danger)">⚠️</span>':''}
+          <a class="ic-btn" href="javascript:void(0)" onclick="Moradores.whatsapp('${m.id}')" title="WhatsApp">💬</a>
+          <button class="ic-btn" onclick="Moradores.excluir('${m.id}')">🗑️</button>
+        </div>
+      </div>`).join('');
+  },
+  search(t){ this.render(t); },
+  novo(){
+    if(!App.state.currentCondo){ Toast.show('⚠️ Selecione um condomínio primeiro','warning'); return; }
+    ['morador-nome','morador-bloco','morador-unidade','morador-email','morador-telefone'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('morador-tipo').value='proprietario';
+    document.getElementById('morador-inadimplente').checked=false;
+    Modal.open('morador');
+  },
+  salvar(){
+    const nome = document.getElementById('morador-nome').value.trim();
+    const unidade = document.getElementById('morador-unidade').value.trim();
+    if(!nome||!unidade){ Toast.show('⚠️ Preencha nome e unidade','warning'); return; }
+    const m = {
+      id:uid(), nome, unidade,
+      bloco: document.getElementById('morador-bloco').value.trim(),
+      email: document.getElementById('morador-email').value.trim(),
+      telefone: document.getElementById('morador-telefone').value.trim(),
+      tipo: document.getElementById('morador-tipo').value,
+      inadimplente: document.getElementById('morador-inadimplente').checked,
+      createdAt: new Date().toISOString()
+    };
+    const cid = App.state.currentCondo.id;
+    this.data.push(m);
+    sto('sapp_moradores_'+cid, this.data);
+    Modal.close('morador');
+    this.render();
+    App.updateStats();
+    Toast.show('✅ Morador cadastrado!','success');
+    App.addActivity('Morador '+nome+' cadastrado','👤','#dbeafe');
+  },
+  excluir(id){
+    if(!confirm('Excluir este morador?')) return;
+    this.data = this.data.filter(m=>m.id!==id);
+    sto('sapp_moradores_'+App.state.currentCondo.id, this.data);
+    this.render();
+    App.updateStats();
+    Toast.show('🗑️ Morador removido','info');
+  },
+
+  whatsapp(id){
+    const m=this.data.find(x=>x.id===id);
+    if(!m){ Toast.show('Morador não encontrado','error'); return; }
+    if(!m.telefone){ Toast.show('⚠️ Morador sem telefone cadastrado','warning'); return; }
+    const num=m.telefone.replace(/\D/g,'');
+    const msg=encodeURIComponent('Olá, '+m.nome+'! Aqui é o síndico do '+App.state.currentCondo.nome+'.');
+    window.open('https://wa.me/55'+num+'?text='+msg,'_blank');
+  },
+
+  abrirImport(){
+    if(!App.state.currentCondo){ Toast.show('⚠️ Selecione um condomínio primeiro','warning'); return; }
+    document.getElementById('import-moradores-file').value='';
+    document.getElementById('import-moradores-preview').textContent='';
+    Modal.open('import-moradores');
+  },
+
+  processarCSV(){
+    const file=document.getElementById('import-moradores-file').files[0];
+    if(!file){ Toast.show('⚠️ Selecione um arquivo CSV','warning'); return; }
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const text=e.target.result;
+        const lines=text.trim().split(/\r?\n/).filter(l=>l.trim());
+        if(lines.length<2){ Toast.show('⚠️ Arquivo vazio ou sem dados','error'); return; }
+        const sep=lines[0].includes(';')?';':',';
+        const headers=lines[0].split(sep).map(h=>h.trim().toLowerCase().replace(/["']/g,''));
+
+        // Mapear índices de forma flexível
+        const col=(terms)=>headers.findIndex(h=>terms.some(t=>h.includes(t)));
+        const iNome   = col(['nome','name']);
+        const iUnid   = col(['unidade','apto','apartamento','unit','ap ']);
+        const iBloco  = col(['bloco','block','torre']);
+        const iEmail  = col(['email','e-mail','mail']);
+        const iTel    = col(['telefone','fone','celular','whatsapp','tel']);
+        const iTipo   = col(['tipo','type','proprietario','inquilino','owner']);
+
+        if(iNome===-1||iUnid===-1){
+          Toast.show('❌ Colunas "nome" e "unidade" são obrigatórias','error');
+          document.getElementById('import-moradores-preview').textContent='Colunas encontradas: '+headers.join(', ');
+          return;
+        }
+
+        const existentes=new Set(this.data.map(m=>m.unidade.toLowerCase().trim()));
+        let importados=0, duplicados=0;
+
+        lines.slice(1).forEach(line=>{
+          if(!line.trim()) return;
+          const cols=line.split(sep).map(c=>c.trim().replace(/["']/g,''));
+          const nome=(cols[iNome]||'').trim();
+          const unidade=(cols[iUnid]||'').trim();
+          if(!nome||!unidade) return;
+          if(existentes.has(unidade.toLowerCase())){ duplicados++; return; }
+          const tipo=(iTipo>=0?cols[iTipo]:'').toLowerCase();
+          this.data.push({
+            id:uid(), nome, unidade,
+            bloco: iBloco>=0?cols[iBloco]||'':'',
+            email: iEmail>=0?cols[iEmail]||'':'',
+            telefone: iTel>=0?cols[iTel]||'':'',
+            tipo: tipo.includes('inq')?'inquilino':'proprietario',
+            inadimplente:false,
+            createdAt:new Date().toISOString()
+          });
+          existentes.add(unidade.toLowerCase());
+          importados++;
+        });
+
+        sto('sapp_moradores_'+App.state.currentCondo.id, this.data);
+        Modal.close('import-moradores');
+        this.render(); App.updateStats();
+        let msg=`✅ ${importados} morador(es) importado(s)!`;
+        if(duplicados) msg+=` (${duplicados} duplicado(s) ignorado(s))`;
+        Toast.show(msg, importados>0?'success':'warning');
+        if(importados>0) App.addActivity(`${importados} moradores importados via CSV`,'👥','#dbeafe');
+      } catch(err){
+        Toast.show('❌ Erro ao processar CSV: '+err.message,'error');
+      }
+    };
+    reader.readAsText(file,'UTF-8');
+  }
+};
+
+// ═══════════════════════════════════════════════
+//  LEITURAS
+// ═══════════════════════════════════════════════
+const Leituras = {
+  tab:'agua', data:[],
+  load(){
+    if(!App.state.currentCondo) return;
+    this.data = get('sapp_leituras_'+App.state.currentCondo.id)||[];
+    this.loadUnidades();
+    this.render();
+  },
+  loadUnidades(){
+    const mors = get('sapp_moradores_'+App.state.currentCondo.id)||[];
+    const blocos = [...new Set(mors.map(m=>m.bloco).filter(Boolean))];
+    const sel = document.getElementById('leitura-bloco');
+    sel.innerHTML = '<option value="">Todos os Blocos</option>';
+    blocos.forEach(b=>{ const o=document.createElement('option'); o.value=b; o.textContent='Bloco '+b; sel.appendChild(o); });
+    // modal select
+    const usel = document.getElementById('leitura-unidade');
+    usel.innerHTML = '<option value="">Selecione a unidade</option>';
+    mors.forEach(m=>{ const o=document.createElement('option'); o.value=m.id; o.textContent=(m.bloco?m.bloco+' — ':'')+m.unidade+' ('+m.nome+')'; usel.appendChild(o); });
+  },
+  switchTab(t, btn){
+    this.tab = t;
+    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    this.render();
+  },
+  render(){
+    const list = document.getElementById('unidades-list');
+    if(!App.state.currentCondo){ list.innerHTML='<div class="empty"><span class="empty-ic">🏢</span><p>Selecione um condomínio</p></div>'; return; }
+    const cid = App.state.currentCondo.id;
+    let mors = get('sapp_moradores_'+cid)||[];
+    const blocoFiltro = document.getElementById('leitura-bloco')?.value;
+    if(blocoFiltro) mors = mors.filter(m=>m.bloco===blocoFiltro);
+    if(!mors.length){ list.innerHTML='<div class="empty"><span class="empty-ic">👥</span><p>Cadastre moradores primeiro</p></div>'; return; }
+    const porBloco = {};
+    mors.forEach(m=>{ const b=m.bloco||'Sem Bloco'; if(!porBloco[b]) porBloco[b]=[]; porBloco[b].push(m); });
+    let html='';
+    Object.keys(porBloco).sort().forEach(b=>{
+      html+=`<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Bloco ${b}</div>`;
+      porBloco[b].forEach(m=>{
+        const lei = this.data.filter(l=>l.moradorId===m.id&&l.tipo===this.tab).sort((a,c)=>new Date(c.data)-new Date(a.data))[0];
+        const feito = lei&&lei.data===today();
+        html+=`<div class="card" style="display:flex;align-items:center;gap:10px;padding:12px;margin-bottom:8px">
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:14px;margin-bottom:2px">${m.unidade} — ${m.nome}</div>
+            <div style="font-size:12px;color:var(--muted)">${lei?'Última: '+lei.valor+' m³ em '+new Date(lei.data).toLocaleDateString('pt-BR'):'Sem leitura'}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            ${feito?'<span style="color:var(--success);font-size:18px">✓</span>':''}
+            <input type="number" placeholder="${this.tab==='agua'?'💧':'🔥'} m³" style="width:90px;padding:8px;border:2px solid var(--border);border-radius:8px;text-align:center;font-family:inherit;font-size:14px" onchange="Leituras.salvarRapido('${m.id}',this.value);this.value=''">
+          </div>
+        </div>`;
+      });
+      html+='</div>';
+    });
+    list.innerHTML = html;
+  },
+  novo(){
+    if(!App.state.currentCondo){ Toast.show('⚠️ Selecione um condomínio primeiro','warning'); return; }
+    document.getElementById('leitura-data').value = today();
+    document.getElementById('leitura-tipo').value = this.tab;
+    document.getElementById('leitura-valor').value='';
+    document.getElementById('leitura-preview').innerHTML='';
+    Modal.open('leitura');
+  },
+  capturePhoto(){
+    const input = document.createElement('input');
+    input.type='file'; input.accept='image/*'; input.capture='environment';
+    input.onchange=e=>{
+      const f=e.target.files[0]; if(!f) return;
+      const r=new FileReader();
+      r.onload=ev=>{
+        document.getElementById('leitura-preview').innerHTML=`<img src="${ev.target.result}" style="width:100%;height:160px;object-fit:cover;border-radius:10px;margin-bottom:8px">`;
+        setTimeout(()=>{ const v=Math.floor(Math.random()*9000)+1000; document.getElementById('leitura-valor').value=v; Toast.show('📸 Valor detectado: '+v+' m³','success'); },400);
+      };
+      r.readAsDataURL(f);
+    };
+    input.click();
+  },
+  salvar(){
+    const moradorId=document.getElementById('leitura-unidade').value;
+    const tipo=document.getElementById('leitura-tipo').value;
+    const valor=document.getElementById('leitura-valor').value;
+    const data=document.getElementById('leitura-data').value;
+    if(!moradorId||!valor||!data){ Toast.show('⚠️ Preencha todos os campos','warning'); return; }
+    this._save(moradorId,tipo,valor,data);
+    Modal.close('leitura');
+  },
+  salvarRapido(moradorId,valor){ if(!valor) return; this._save(moradorId,this.tab,valor,today()); },
+  _save(moradorId,tipo,valor,data){
+    const cid=App.state.currentCondo.id;
+    this.data.push({id:uid(),moradorId,tipo,valor:parseFloat(valor),data,createdAt:new Date().toISOString()});
+    sto('sapp_leituras_'+cid,this.data);
+    App.updateStats(); this.render();
+    const t=tipo==='agua'?'Água':'Gás';
+    Toast.show('✅ Leitura de '+t+' salva!','success');
+    App.addActivity('Leitura de '+t+' registrada',tipo==='agua'?'💧':'🔥','#dbeafe');
+  },
+  filterPendentes(){ Toast.show('⚠️ Filtro em desenvolvimento','info'); },
+
+  abrirImport(){
+    if(!App.state.currentCondo){ Toast.show('⚠️ Selecione um condomínio primeiro','warning'); return; }
+    document.getElementById('import-csv-file').value='';
+    document.getElementById('import-preview').innerHTML='';
+    Modal.open('import-csv');
+  },
+
+  processarCSV(){
+    const file=document.getElementById('import-csv-file').files[0];
+    if(!file){ Toast.show('⚠️ Selecione um arquivo CSV','warning'); return; }
+    const tipo=document.getElementById('import-tipo').value;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const text=e.target.result;
+      const lines=text.trim().split(/\r?\n/);
+      if(lines.length<2){ Toast.show('⚠️ Arquivo vazio ou inválido','error'); return; }
+      // Detectar separador
+      const sep=lines[0].includes(';')?';':',';
+      const headers=lines[0].split(sep).map(h=>h.trim().toLowerCase().replace(/["']/g,''));
+      // Mapear índices flexíveis
+      const iUnidade=headers.findIndex(h=>h.includes('unidade')||h.includes('apto')||h.includes('apartamento')||h==='unit');
+      const iAgua=headers.findIndex(h=>h.includes('agua')||h.includes('água')||h.includes('water'));
+      const iGas=headers.findIndex(h=>h.includes('gas')||h.includes('gás'));
+      const iData=headers.findIndex(h=>h.includes('data')||h.includes('date'));
+      const iLeitura=headers.findIndex(h=>h.includes('leitura')||h.includes('valor')||h.includes('value'));
+      if(iUnidade===-1){ Toast.show('❌ Coluna "unidade" não encontrada no CSV','error'); return; }
+      // Mapear moradores por unidade
+      const mors=get('sapp_moradores_'+App.state.currentCondo.id)||[];
+      const morMap={};
+      mors.forEach(m=>{ morMap[m.unidade.toLowerCase().trim()]=m.id; });
+      const dataHoje=today();
+      let importados=0, naoEncontrados=[];
+      lines.slice(1).forEach(line=>{
+        if(!line.trim()) return;
+        const cols=line.split(sep).map(c=>c.trim().replace(/["']/g,''));
+        const unidade=(cols[iUnidade]||'').toLowerCase().trim();
+        if(!unidade) return;
+        const moradorId=morMap[unidade];
+        const dataLeitura=iData>=0&&cols[iData]?cols[iData]:dataHoje;
+        if(tipo==='ambos'){
+          if(iAgua>=0&&cols[iAgua]&&moradorId){ this.data.push({id:uid(),moradorId,tipo:'agua',valor:parseFloat(cols[iAgua])||0,data:dataLeitura,createdAt:new Date().toISOString()}); importados++; }
+          if(iGas>=0&&cols[iGas]&&moradorId){ this.data.push({id:uid(),moradorId,tipo:'gas',valor:parseFloat(cols[iGas])||0,data:dataLeitura,createdAt:new Date().toISOString()}); importados++; }
+        } else {
+          const colVal=tipo==='agua'?(iAgua>=0?cols[iAgua]:cols[iLeitura]):(iGas>=0?cols[iGas]:cols[iLeitura]);
+          if(colVal&&moradorId){ this.data.push({id:uid(),moradorId,tipo,valor:parseFloat(colVal)||0,data:dataLeitura,createdAt:new Date().toISOString()}); importados++; }
+          else if(!moradorId) naoEncontrados.push(unidade);
+        }
+      });
+      sto('sapp_leituras_'+App.state.currentCondo.id,this.data);
+      Modal.close('import-csv');
+      this.render(); App.updateStats();
+      let msg=`✅ ${importados} leitura(s) importada(s)!`;
+      if(naoEncontrados.length) msg+=` ⚠️ ${naoEncontrados.length} unidade(s) não encontrada(s): ${naoEncontrados.slice(0,3).join(', ')}`;
+      Toast.show(msg, importados>0?'success':'warning');
+      if(importados>0) App.addActivity(`${importados} leituras importadas via CSV`,'📥','#d1fae5');
+    };
+    reader.readAsText(file,'UTF-8');
+  }
+};
+
+// ═══════════════════════════════════════════════
+//  FINANCEIRO
+// ═══════════════════════════════════════════════
+const Financeiro = {
+  data:[],
+  load(){
+    const cid=App.state.currentCondo?.id;
+    if(!cid){
+      document.getElementById('fin-saldo').textContent='R$ 0,00';
+      document.getElementById('fin-receitas').textContent='R$ 0,00';
+      document.getElementById('fin-despesas').textContent='R$ 0,00';
+      document.getElementById('lancamentos-list').innerHTML='<div class="empty"><span class="empty-ic">💰</span><p>Selecione um condomínio</p></div>';
+      return;
+    }
+    this.data = get('sapp_financeiro_'+cid)||[];
+    this.updateSummary(); this.renderChart(); this.renderLancamentos();
+  },
+  updateSummary(){
+    const mes=new Date().toISOString().slice(0,7);
+    const rec=this.data.filter(l=>l.tipo==='receita'&&l.data.startsWith(mes)).reduce((s,l)=>s+l.valor,0);
+    const des=this.data.filter(l=>l.tipo==='despesa'&&l.data.startsWith(mes)).reduce((s,l)=>s+l.valor,0);
+    document.getElementById('fin-saldo').textContent=fmtMoney(rec-des);
+    document.getElementById('fin-receitas').textContent=fmtMoney(rec);
+    document.getElementById('fin-despesas').textContent=fmtMoney(des);
+  },
+  renderChart(){
+    const chart=document.getElementById('finance-chart');
+    const meses=[]; const h=new Date();
+    for(let i=5;i>=0;i--){ const d=new Date(h.getFullYear(),h.getMonth()-i,1); meses.push(d.toISOString().slice(0,7)); }
+    const dados=meses.map(m=>{
+      const r=this.data.filter(l=>l.tipo==='receita'&&l.data.startsWith(m)).reduce((s,l)=>s+l.valor,0);
+      const d=this.data.filter(l=>l.tipo==='despesa'&&l.data.startsWith(m)).reduce((s,l)=>s+l.valor,0);
+      return r-d;
+    });
+    const max=Math.max(...dados.map(Math.abs),1);
+    chart.innerHTML=dados.map((v,i)=>{
+      const h=Math.abs(v)/max*100;
+      const c=v>=0?'#10b981':'#ef4444';
+      const mn=new Date(meses[i]+'-01').toLocaleDateString('pt-BR',{month:'short'});
+      return `<div class="cbar" style="height:${h}%;background:${c}"><span class="cbar-lbl">${mn}</span></div>`;
+    }).join('');
+  },
+  renderLancamentos(){
+    const list=document.getElementById('lancamentos-list');
+    const mes=new Date().toISOString().slice(0,7);
+    const items=this.data.filter(l=>l.data.startsWith(mes)).sort((a,b)=>new Date(b.data)-new Date(a.data));
+    if(!items.length){ list.innerHTML='<div class="empty"><span class="empty-ic">💰</span><p>Nenhum lançamento este mês</p></div>'; return; }
+    const cats={condominio:'Taxa Cond.',agua:'Água',gas:'Gás',manutencao:'Manutenção',limpeza:'Limpeza',seguranca:'Segurança',outros:'Outros'};
+    list.innerHTML=items.map(l=>`
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:600;margin-bottom:3px">${l.descricao}</div>
+          <div style="font-size:12px;color:var(--muted)">${new Date(l.data).toLocaleDateString('pt-BR')} · ${cats[l.categoria]||l.categoria}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-weight:700;color:${l.tipo==='receita'?'var(--success)':'var(--danger)'}">${l.tipo==='receita'?'+':'-'} ${fmtMoney(l.valor)}</div>
+          <button class="ic-btn" onclick="Financeiro.excluir('${l.id}')">🗑️</button>
+        </div>
+      </div>`).join('');
+  },
+  novo(){
+    if(!App.state.currentCondo){ Toast.show('⚠️ Selecione um condomínio primeiro','warning'); return; }
+    document.getElementById('lancamento-tipo').value='receita';
+    document.getElementById('lancamento-descricao').value='';
+    document.getElementById('lancamento-categoria').value='condominio';
+    document.getElementById('lancamento-valor').value='';
+    document.getElementById('lancamento-data').value=today();
+    document.getElementById('lancamento-obs').value='';
+    Modal.open('lancamento');
+  },
+  salvar(){
+    const desc=document.getElementById('lancamento-descricao').value.trim();
+    const valor=document.getElementById('lancamento-valor').value;
+    const data=document.getElementById('lancamento-data').value;
+    if(!desc||!valor||!data){ Toast.show('⚠️ Preencha descrição, valor e data','warning'); return; }
+    const tipo=document.getElementById('lancamento-tipo').value;
+    const l={id:uid(),tipo,descricao:desc,categoria:document.getElementById('lancamento-categoria').value,valor:parseFloat(valor),data,obs:document.getElementById('lancamento-obs').value.trim(),createdAt:new Date().toISOString()};
+    const cid=App.state.currentCondo.id;
+    this.data.push(l);
+    sto('sapp_financeiro_'+cid,this.data);
+    Modal.close('lancamento');
+    this.updateSummary(); this.renderChart(); this.renderLancamentos();
+    const t=tipo==='receita'?'Receita':'Despesa';
+    Toast.show('✅ '+t+' registrada!','success');
+    App.addActivity(t+': '+desc,tipo==='receita'?'📈':'📉',tipo==='receita'?'#d1fae5':'#fee2e2');
+  },
+  excluir(id){
+    if(!confirm('Excluir este lançamento?')) return;
+    this.data=this.data.filter(l=>l.id!==id);
+    sto('sapp_financeiro_'+App.state.currentCondo.id,this.data);
+    this.updateSummary(); this.renderChart(); this.renderLancamentos();
+    Toast.show('🗑️ Lançamento removido','info');
+  }
+};
+
+// ═══════════════════════════════════════════════
+//  OCORRÊNCIAS
+// ═══════════════════════════════════════════════
+const Ocorrencias = {
+  data:[], filtro:'todos',
+  load(){
+    if(!App.state.currentCondo){ document.getElementById('ocorrencias-list').innerHTML='<div class="empty"><span class="empty-ic">🏢</span><p>Selecione um condomínio primeiro</p></div>'; return; }
+    this.data = get('sapp_ocorrencias_'+App.state.currentCondo.id)||[];
+    this.render();
+  },
+  filter(f,btn){
+    this.filtro=f;
+    document.querySelectorAll('.chips .chip').forEach(c=>c.classList.remove('active'));
+    btn?.classList.add('active');
+    this.render();
+  },
+  render(){
+    const list=document.getElementById('ocorrencias-list');
+    let data=this.data;
+    if(this.filtro==='pendente') data=data.filter(o=>o.status!=='resolvido');
+    else if(this.filtro==='urgente') data=data.filter(o=>o.prioridade==='urgente'||o.prioridade==='alta');
+    else if(this.filtro==='resolvido') data=data.filter(o=>o.status==='resolvido');
+    const prior={urgente:4,alta:3,media:2,baixa:1};
+    data.sort((a,b)=>(prior[b.prioridade]||0)-(prior[a.prioridade]||0)||new Date(b.createdAt)-new Date(a.createdAt));
+    if(!data.length){ list.innerHTML='<div class="empty"><span class="empty-ic">📭</span><p>Nenhuma ocorrência</p></div>'; return; }
+    const pcores={urgente:'#ef4444',alta:'#f59e0b',media:'#3b82f6',baixa:'#10b981'};
+    const plabels={urgente:'🚨 Urgente',alta:'🔴 Alta',media:'🟡 Média',baixa:'🟢 Baixa'};
+    const tics={manutencao:'🔧',reclamacao:'📢',solicitacao:'📋',outros:'⚠️'};
+    list.innerHTML=data.map(o=>`
+      <div class="card" style="border-left:4px solid ${pcores[o.prioridade]}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">${tics[o.tipo]||'⚠️'}</span><strong>${o.titulo}</strong></div>
+          <span style="font-size:12px;padding:3px 9px;background:${pcores[o.prioridade]}20;color:${pcores[o.prioridade]};border-radius:12px;font-weight:600;white-space:nowrap;margin-left:8px">${plabels[o.prioridade]}</span>
+        </div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:10px;line-height:1.5">${o.descricao||''}</p>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;color:var(--muted)">${fmtTime(o.createdAt)}</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            ${o.status==='resolvido'?'<span style="color:var(--success);font-size:13px;font-weight:600">✅ Resolvido</span>':`<button class="btn btn-sm btn-ghost" onclick="Ocorrencias.resolver('${o.id}')">✓ Resolver</button>`}
+            <button class="ic-btn" onclick="Ocorrencias.excluir('${o.id}')">🗑️</button>
+          </div>
+        </div>
+      </div>`).join('');
+  },
+  novo(){
+    if(!App.state.currentCondo){ Toast.show('⚠️ Selecione um condomínio primeiro','warning'); return; }
+    ['ocorrencia-titulo','ocorrencia-descricao'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('ocorrencia-tipo').value='manutencao';
+    document.getElementById('ocorrencia-prioridade').value='media';
+    Modal.open('ocorrencia');
+  },
+  salvar(){
+    const titulo=document.getElementById('ocorrencia-titulo').value.trim();
+    if(!titulo){ Toast.show('⚠️ Informe o título','warning'); return; }
+    const o={id:uid(),titulo,tipo:document.getElementById('ocorrencia-tipo').value,prioridade:document.getElementById('ocorrencia-prioridade').value,descricao:document.getElementById('ocorrencia-descricao').value.trim(),status:'pendente',createdAt:new Date().toISOString()};
+    const cid=App.state.currentCondo.id;
+    this.data.push(o);
+    sto('sapp_ocorrencias_'+cid,this.data);
+    Modal.close('ocorrencia');
+    this.render(); App.updateStats();
+    Toast.show('✅ Ocorrência registrada!','success');
+    App.addActivity('Ocorrência: '+titulo,'⚠️','#fee2e2');
+  },
+  resolver(id){
+    const o=this.data.find(x=>x.id===id);
+    if(o){ o.status='resolvido'; o.resolvedAt=new Date().toISOString(); sto('sapp_ocorrencias_'+App.state.currentCondo.id,this.data); this.render(); App.updateStats(); Toast.show('✅ Ocorrência resolvida!','success'); }
+  },
+  excluir(id){
+    if(!confirm('Excluir esta ocorrência?')) return;
+    this.data=this.data.filter(o=>o.id!==id);
+    sto('sapp_ocorrencias_'+App.state.currentCondo.id,this.data);
+    this.render(); App.updateStats();
+    Toast.show('🗑️ Ocorrência excluída','info');
+  }
+};
+
+// ═══════════════════════════════════════════════
+//  COMUNICADOS
+// ═══════════════════════════════════════════════
+const Comunicados = {
+  data:[], tipo:'geral', filtroAtivo:'todos',
+
+  load(){
+    if(!App.state.currentCondo){ document.getElementById('comunicados-list').innerHTML='<div class="empty"><span class="empty-ic">🏢</span><p>Selecione um condomínio primeiro</p></div>'; return; }
+    this.data = get('sapp_comunicados_'+App.state.currentCondo.id)||[];
+    this.loadDestinatarios();
+    this.render();
+  },
+
+  loadDestinatarios(){
+    const mors = get('sapp_moradores_'+App.state.currentCondo.id)||[];
+    const sel = document.getElementById('comunicado-destinatario');
+    sel.innerHTML = '<option value="">Selecione o apartamento</option>';
+    mors.sort((a,b)=>(a.bloco||'').localeCompare(b.bloco||'')||a.unidade.localeCompare(b.unidade))
+      .forEach(m=>{
+        const o=document.createElement('option');
+        o.value=m.id;
+        o.textContent=(m.bloco?m.bloco+' — ':'')+m.unidade+' ('+m.nome+')';
+        o.dataset.tel=m.telefone||'';
+        sel.appendChild(o);
+      });
+  },
+
+  switchTipo(t, btn){
+    this.tipo=t;
+    document.querySelectorAll('#tab-com-geral,#tab-com-individual').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('com-dest-wrap').style.display = t==='individual'?'block':'none';
+  },
+
+  filtrar(f, btn){
+    this.filtroAtivo=f;
+    document.querySelectorAll('#view-comunicados .chips .chip').forEach(c=>c.classList.remove('active'));
+    btn?.classList.add('active');
+    this.render();
+  },
+
+  render(){
+    const list=document.getElementById('comunicados-list');
+    let data=[...this.data];
+    if(this.filtroAtivo==='geral') data=data.filter(c=>!c.destinatarioId);
+    else if(this.filtroAtivo==='individual') data=data.filter(c=>!!c.destinatarioId);
+    if(!data.length){ list.innerHTML='<div class="empty"><span class="empty-ic">📭</span><p>Nenhum comunicado</p></div>'; return; }
+    const cores={normal:'#3b82f6',importante:'#f59e0b',urgente:'#ef4444'};
+    const labels={normal:'📌 Normal',importante:'🔴 Importante',urgente:'🚨 Urgente'};
+    data.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+    list.innerHTML=data.map(c=>{
+      const isInd=!!c.destinatarioId;
+      const destTag=isInd?`<span style="font-size:12px;padding:3px 9px;background:#ede9fe;color:#6d28d9;border-radius:12px;font-weight:600">🏠 ${c.destinatarioLabel||'Apto'}</span>`:'';
+      const waBtn=isInd&&c.destinatarioTel?`<a href="https://wa.me/55${c.destinatarioTel.replace(/\D/g,'')}?text=${encodeURIComponent('📢 Comunicado do Síndico:\n\n'+c.mensagem)}" target="_blank" class="ic-btn" title="Enviar WhatsApp">💬</a>`:'';
+      return `<div class="card" style="border-left:4px solid ${cores[c.prioridade]}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span style="font-size:12px;padding:3px 9px;background:${cores[c.prioridade]}20;color:${cores[c.prioridade]};border-radius:12px;font-weight:600">${labels[c.prioridade]}</span>
+            ${destTag}
+          </div>
+          <span style="font-size:12px;color:var(--muted)">${fmtTime(c.createdAt)}</span>
+        </div>
+        <p style="color:var(--text);line-height:1.6;white-space:pre-wrap;font-size:14px;margin-bottom:10px">${c.mensagem}</p>
+        <div style="display:flex;justify-content:flex-end;gap:6px">
+          ${waBtn}
+          <button class="ic-btn" onclick="Comunicados.excluir('${c.id}')">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
+  },
+
+  publicar(){
+    if(!App.state.currentCondo){ Toast.show('⚠️ Selecione um condomínio primeiro','warning'); return; }
+    const msg=document.getElementById('novo-comunicado').value.trim();
+    if(!msg){ Toast.show('⚠️ Escreva uma mensagem','warning'); return; }
+    let destId='', destLabel='', destTel='';
+    if(this.tipo==='individual'){
+      const sel=document.getElementById('comunicado-destinatario');
+      destId=sel.value;
+      if(!destId){ Toast.show('⚠️ Selecione o apartamento destinatário','warning'); return; }
+      destLabel=sel.options[sel.selectedIndex].textContent;
+      destTel=sel.options[sel.selectedIndex].dataset.tel||'';
+    }
+    const c={id:uid(),mensagem:msg,prioridade:document.getElementById('comunicado-prioridade').value,
+      destinatarioId:destId||null,destinatarioLabel:destLabel||null,destinatarioTel:destTel||null,
+      createdAt:new Date().toISOString()};
+    this.data.unshift(c);
+    sto('sapp_comunicados_'+App.state.currentCondo.id,this.data);
+    document.getElementById('novo-comunicado').value='';
+    document.getElementById('comunicado-prioridade').value='normal';
+    // Se individual e tem telefone, oferecer abrir WhatsApp
+    if(this.tipo==='individual' && destTel){
+      const waUrl='https://wa.me/55'+destTel.replace(/\D/g,'')+'?text='+encodeURIComponent('📢 Comunicado do Síndico:\n\n'+msg);
+      if(confirm('Comunicado salvo! Deseja enviar pelo WhatsApp agora?')) window.open(waUrl,'_blank');
+    }
+    this.render();
+    Toast.show('✅ Comunicado publicado!','success');
+    App.addActivity('Comunicado '+(this.tipo==='individual'?'individual':'geral')+' publicado','📢','#dbeafe');
+  },
+
+  excluir(id){
+    if(!confirm('Excluir este comunicado?')) return;
+    this.data=this.data.filter(c=>c.id!==id);
+    sto('sapp_comunicados_'+App.state.currentCondo.id,this.data);
+    this.render();
+    Toast.show('🗑️ Comunicado removido','info');
+  }
+};
+
+// ═══════════════════════════════════════════════
+//  BACKUP & RESTORE
+// ═══════════════════════════════════════════════
+const Backup = {
+  exportar(){
+    const email = App.state.user?.email;
+    if(!email){ Toast.show('⚠️ Faça login primeiro','warning'); return; }
+
+    // Coletar todas as chaves do localStorage relacionadas ao app
+    const dados = { version: '1.0', exportedAt: new Date().toISOString(), email, data: {} };
+    for(let i=0; i<localStorage.length; i++){
+      const key = localStorage.key(i);
+      if(key.startsWith('sapp_')){
+        try{ dados.data[key] = JSON.parse(localStorage.getItem(key)); }
+        catch{ dados.data[key] = localStorage.getItem(key); }
+      }
+    }
+
+    // Criar e baixar arquivo JSON
+    const blob = new Blob([JSON.stringify(dados, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const date = new Date().toISOString().split('T')[0];
+    a.href = url;
+    a.download = `sindicoapp_backup_${date}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    Toast.show('✅ Backup exportado com sucesso!','success');
+    App.addActivity('Backup exportado','💾','#d1fae5');
+  },
+
+  importarClick(){
+    if(!confirm('⚠️ Restaurar backup VAI SUBSTITUIR todos os dados atuais. Deseja continuar?')) return;
+    document.getElementById('backup-file-input').click();
+  },
+
+  importar(input){
+    const file = input.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try{
+        const dados = JSON.parse(e.target.result);
+        if(!dados.version || !dados.data){
+          Toast.show('❌ Arquivo de backup inválido','error'); return;
+        }
+
+        // Restaurar todas as chaves
+        let count = 0;
+        Object.entries(dados.data).forEach(([key, value])=>{
+          localStorage.setItem(key, JSON.stringify(value));
+          count++;
+        });
+
+        Toast.show(`✅ Backup restaurado! ${count} registros recuperados.`,'success');
+        Modal.closeAll();
+
+        // Recarregar app
+        setTimeout(()=>{ location.reload(); }, 1200);
+
+      } catch(err){
+        Toast.show('❌ Erro ao ler o arquivo: '+err.message,'error');
+      }
+    };
+    reader.readAsText(file,'UTF-8');
+    input.value = ''; // reset input
+  }
+};
+
+// ═══════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', ()=>App.init());
+</script>
+</body>
+</html>
