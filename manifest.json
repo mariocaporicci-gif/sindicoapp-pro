@@ -2,20 +2,21 @@
   "name": "SíndicoApp Pro",
   "short_name": "SíndicoApp",
   "description": "Gestão Condominial Profissional - MAC ADM",
-  "start_url": "/",
+  "start_url": "/sindicoapp-pro/",
+  "scope": "/sindicoapp-pro/",
   "display": "standalone",
-  "background_color": "#1a9cb0",
-  "theme_color": "#1a9cb0",
+  "background_color": "#1a237e",
+  "theme_color": "#1a237e",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "/sindicoapp-pro/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "/sindicoapp-pro/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
