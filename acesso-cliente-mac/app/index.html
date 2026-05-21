@@ -204,22 +204,37 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
       <p>Gestão completa para síndicos</p>
     </div>
     <div class="card-box">
-      <h2>Entrar na conta</h2>
+      <h2 id="login-title">🔑 Código de Acesso</h2>
       <div id="login-error" class="err-msg hidden"></div>
-      <div class="fg">
-        <label>Nome (para exibição)</label>
-        <input type="text" id="login-name" placeholder="Seu nome">
+
+      <!-- ETAPA 1: Código mestre -->
+      <div id="step-master">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5">Insira o código de acesso fornecido pelo síndico para criar sua conta.</p>
+        <div class="fg">
+          <label>Código de Acesso *</label>
+          <input type="password" id="login-master" placeholder="Código fornecido pelo síndico">
+        </div>
+        <button class="btn btn-primary" onclick="Auth.checkMaster()">🔐 Continuar</button>
       </div>
-      <div class="fg">
-        <label>E-mail</label>
-        <input type="email" id="login-email" placeholder="seu@email.com">
+
+      <!-- ETAPA 2: Criar conta / Login -->
+      <div id="step-account" style="display:none">
+        <p style="font-size:13px;color:#065f46;margin-bottom:14px;font-weight:600;background:#d1fae5;padding:10px;border-radius:8px">✅ Código válido! Crie sua conta ou entre.</p>
+        <div class="fg">
+          <label>Nome (para exibição)</label>
+          <input type="text" id="login-name" placeholder="Seu nome">
+        </div>
+        <div class="fg">
+          <label>E-mail *</label>
+          <input type="email" id="login-email" placeholder="seu@email.com">
+        </div>
+        <div class="fg">
+          <label>Senha *</label>
+          <input type="password" id="login-password" placeholder="Mínimo 6 caracteres">
+        </div>
+        <button class="btn btn-primary" onclick="Auth.login()">🔐 Entrar / Criar Conta</button>
+        <button class="btn btn-ghost" onclick="Auth.backToMaster()" style="margin-top:4px">← Voltar</button>
       </div>
-      <div class="fg">
-        <label>Senha</label>
-        <input type="password" id="login-password" placeholder="Mínimo 6 caracteres">
-      </div>
-      <button class="btn btn-primary" onclick="Auth.login()">🔐 Entrar / Cadastrar</button>
-      <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:8px">Se for seu primeiro acesso, a conta será criada automaticamente.</p>
     </div>
   </div>
 </div>
@@ -690,6 +705,27 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') Modal.closeAll();
 //  AUTH (local, sem Firebase)
 // ═══════════════════════════════════════════════
 const Auth = {
+  MASTER_KEY: 'sindico1001',
+
+  checkMaster(){
+    const master = document.getElementById('login-master').value;
+    const err = document.getElementById('login-error');
+    if(!master){ err.textContent='⚠️ Digite o código de acesso'; err.classList.remove('hidden'); return; }
+    if(master !== this.MASTER_KEY){ err.textContent='❌ Código de acesso inválido. Solicite ao síndico.'; err.classList.remove('hidden'); return; }
+    err.classList.add('hidden');
+    document.getElementById('step-master').style.display='none';
+    document.getElementById('step-account').style.display='block';
+    document.getElementById('login-title').textContent='👤 Criar Conta / Entrar';
+  },
+
+  backToMaster(){
+    document.getElementById('step-master').style.display='block';
+    document.getElementById('step-account').style.display='none';
+    document.getElementById('login-master').value='';
+    document.getElementById('login-title').textContent='🔑 Código de Acesso';
+    document.getElementById('login-error').classList.add('hidden');
+  },
+
   login(){
     const name = document.getElementById('login-name').value.trim();
     const email = document.getElementById('login-email').value.trim();
